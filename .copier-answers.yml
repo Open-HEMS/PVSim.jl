@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier
+AnswerStrategy: recommended
+Authors: Stefan de Lange
+CodeOfConductContact: Stefan de Lange
+ConfigIndentation: 2
+JuliaIndentation: 4
+JuliaMinVersion: '1.10'
+License: MIT
+LicenseCopyrightHolders: Stefan de Lange
+MarkdownIndentation: 2
+PackageName: PVSim
+PackageOwner: Open-HEMS
+PackageUUID: 87a962da-d934-5b88-9387-356901d8659f
+_commit: v0.14.1
+_src_path: https://github.com/JuliaBesties/BestieTemplate.jl

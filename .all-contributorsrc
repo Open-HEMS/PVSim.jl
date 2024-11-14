@@ -1,0 +1,5 @@
+{
+  "projectName": "PVSim",
+  "projectOwner": "Open-HEMS",
+  "files": ["README.md", "docs/src/index.md"]
+}
