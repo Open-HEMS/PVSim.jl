@@ -1,11 +1,10 @@
 module PVSim
 
-"""
-    hi = hello_world()
-A simple function to return "Hello, World!"
-"""
-function hello_world()
-    return "Hello, World!"
-end
+using ModelingToolkit, ModelingToolkitStandardLibrary
+using ModelingToolkit: t_nounits as t
+using OrdinaryDiffEq
+using DataInterpolations
 
-end
+include("PVModule/PVModule.jl")
+
+end # module
