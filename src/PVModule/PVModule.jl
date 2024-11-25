@@ -11,7 +11,7 @@ using ModelingToolkitStandardLibrary.Blocks
 
 using DataInterpolations
 
-export SingleDiode
+export SingleDiode, VariableResistor
 include("single_diode.jl")
 
 end
