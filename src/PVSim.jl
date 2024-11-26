@@ -5,6 +5,6 @@ using ModelingToolkit: t_nounits as t
 using OrdinaryDiffEq
 using DataInterpolations
 
-include("PVModule/PVModule.jl")
+include("IVtools/IVtools.jl")
 
 end # module

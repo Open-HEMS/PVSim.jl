@@ -8,47 +8,46 @@ The diode light current is specified using callable parameters:
 https://docs.sciml.ai/ModelingToolkit/dev/tutorials/callable_params/#Callable-parameters-and-interpolating-data
 """
 
-@mtkmodel HeatingDiode begin
-    begin
-        k = 1.380649e-23 # Boltzmann constant (J/K)
-        q = 1.602176634e-19 # Elementary charge (C)
-    end
+"""
+    SingleDiode(current, time; n = 1.0, I_s = 1e-6, R_sh_val = 1e5, R_ser_val = 1e-4, T_a = 300.0)
 
-    @extend v, i = oneport = OnePort(; v = 0.0)
-    @components begin
-        port = HeatPort()
-    end
-    @parameters begin
-        Is = 1e-6, [description = "Saturation current (A)"]
-        n = 1, [description = "Ideality factor"]
-    end
-    @variables begin
-        Vt(t), [description = "Thermal voltage"]
-    end
-    @equations begin
-        Vt ~ k * port.T / q  # Thermal voltage equation
-        i ~ Is * (exp(v / (n * Vt)) - 1)  # Shockley diode equation
-        port.Q_flow ~ -v * i  # -LossPower
-    end
-end
+Low level implementation of the single diode model.
 
-function SingleDiode(data, time)
-    @named I_L = ParametrizedInterpolation(LinearInterpolation, data, time)
+TODO: This component should be well-tested.
+
+TODO: Currently the cell temperature is fixed to `T_a`, but this can be made time-dependent.
+
+TODO: Currently the MTK components that make up this model are defined in this file until 
+MTK standard libary releases them.
+
+TODO: For now Single_Diode has to be wrapped in a function until some bugs are fixed in MTK.
+Most notably, I_L can't be defined inside @components, see: 
+https://github.com/SciML/ModelingToolkitStandardLibrary.jl/issues/340
+
+Ultimately we want to set parameters in the model as is shown in: 
+https://docs.sciml.ai/ModelingToolkit/dev/basics/MTKLanguage/#@components-begin-block
+"""
+function SingleDiode(
+    current::AbstractVector{<:Real},
+    time::AbstractVector{<:Real};
+    n::Float64 = 1.0,
+    I_s::Float64 = 1e-6,
+    R_sh_val::Float64 = 1e5,
+    R_ser_val::Float64 = 1e-4,
+    T_a::Float64 = 300.0,
+)
+    @named I_L = ParametrizedInterpolation(LinearInterpolation, current, time)
 
     @mtkmodel Single_Diode begin
-        @parameters begin
-            n::Float64 = 1.0, [description = "Ideality factor"]
-            I_s::Float64 = 1e-6, [description = "Saturation current (A)"]
-            R_sh_val::Float64 = 1e5, [description = "Shunt resistance (Ohm)"]
-            R_ser_val::Float64 = 1e-2, [description = "Series resistance (Ohm)"]
-        end
+
+        # TODO: add @parameters block when the bug is fixed
 
         @components begin
             R_sh = Resistor(R = R_sh_val)
             R_ser = Resistor(R = R_ser_val)
             diode = HeatingDiode(n = n, Is = I_s)
             source = Current()
-            temp = FixedTemperature(T = 300.0)
+            temp = FixedTemperature(T = T_a)
             pos = Pin()
             neg = Pin()
         end
@@ -82,22 +81,32 @@ function SingleDiode(data, time)
 
     @named sys = Single_Diode()
     sys = compose(sys, [I_L])
-    # structural_simplify(sys)
 end
 
-# positive side
-# connect(source.n, diode.p)
-# connect(source.n, R_sh.p)
-# connect(R_sh.p, R_ser.p)
-# connect(R_ser.n, pos)
-# connect(diode.p, pos)
 
-# negative side
-# connect(source.p, diode.n)
-# connect(source.p, R_sh.n)
-# connect(source.p, neg)
-# connect(diode.n, neg)
-# connect(R_sh.n, neg)
+@mtkmodel HeatingDiode begin
+    begin
+        k = 1.380649e-23 # Boltzmann constant (J/K)
+        q = 1.602176634e-19 # Elementary charge (C)
+    end
+
+    @extend v, i = oneport = OnePort(; v = 0.0)
+    @components begin
+        port = HeatPort()
+    end
+    @parameters begin
+        Is = 1e-6, [description = "Saturation current (A)"]
+        n = 1, [description = "Ideality factor"]
+    end
+    @variables begin
+        Vt(t), [description = "Thermal voltage"]
+    end
+    @equations begin
+        Vt ~ k * port.T / q  # Thermal voltage equation
+        i ~ Is * (exp(v / (n * Vt)) - 1)  # Shockley diode equation
+        port.Q_flow ~ -v * i  # -LossPower
+    end
+end
 
 """
     VariableResistor(; name, R_ref = 1.0, T_ref = 300.15, R_const = 1e-3, T_dep = false)

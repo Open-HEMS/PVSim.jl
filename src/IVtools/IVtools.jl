@@ -1,7 +1,7 @@
 """
-Library of DC cell / module models.
+Utilities and models for constructing IV curves.
 """
-module PVModule
+module IVtools
 
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
@@ -10,8 +10,12 @@ using ModelingToolkitStandardLibrary.Thermal
 using ModelingToolkitStandardLibrary.Blocks
 
 using DataInterpolations
+using OrdinaryDiffEq
 
 export SingleDiode, VariableResistor
 include("single_diode.jl")
 
-end
+export iv_curve
+include("iv_curve.jl")
+
+end # module
