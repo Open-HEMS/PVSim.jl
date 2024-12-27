@@ -15,7 +15,8 @@ makedocs(;
     repo = "https://github.com/Open-HEMS/PVSim.jl/blob/{commit}{path}#{line}",
     sitename = "PVSim.jl",
     format = Documenter.HTML(; canonical = "https://Open-HEMS.github.io/PVSim.jl"),
-    pages = ["index.md"; numbered_pages],
+    # pages = ["index.md"; numbered_pages],
+    pages = ["index.md"],
 )
 
 deploydocs(; repo = "github.com/Open-HEMS/PVSim.jl")
